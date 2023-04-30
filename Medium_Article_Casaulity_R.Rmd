@@ -1,0 +1,48 @@
+---
+title: "Medium Article - Causality in R"
+author: "Usama Naeem Toor"
+date: "2023-04-30"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(tidy = TRUE)
+```
+
+### Install Libraries
+```{r, message = FALSE}
+library(tidyverse)
+library(dplyr)
+library(readxl)
+library(ivreg)
+library(car)
+```
+
+### Read Data
+```{r warning = FALSE, message = FALSE}
+# Read Data
+data1 <- read_csv("chalfin_data_335-1.csv")
+```
+
+## Perform 2SLS Model in R
+
+We use the Ivreg function to perform 2SLS Model. The 2SLS model has multiple formula structure, but the one I prefer to use is as follows: 
+
+Outcome ~ Exog | Endog | Instrument
+
+Personally, I feel that R is a much better option than Python!
+```{r}
+# 2SLS Model through ivreg
+
+SLS_reg <- function(dep_var) {
+  reg <- ivreg(dep_var ~ dfbnonmex + dushisp + dblack + deduc1 + deduc2 + deduc3 + deduc4 + dage0_14 + dage15_24 + dage25_39 + dage40_54 + demployed + dusbirths + grp_1 + grp_2 + grp_3 + grp_4 + grp_5 + grp_6 + grp_7 + grp_8 + grp_9 + grp_10 + grp_11 | dmexfb_alt | dins,
+  data = data1, weights = data1$popweight)
+    estimates <- summary(reg)
+    return(estimates)
+}
+SLS_reg(data1$dlogpc_murder)
+```
